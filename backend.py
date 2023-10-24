@@ -3,7 +3,7 @@ from tkinter import messagebox
 
 
 def search_by_name(name):
-    """dobavlja ime iz baze"""
+    """name from the base"""
     with sqlite3.connect("phonebook.db") as conn:
         c = conn.cursor()
         c.execute("SELECT * FROM Korisnici WHERE ime=?", (name,))
@@ -17,7 +17,7 @@ def search_by_name(name):
 
 
 def search_contacts(criteria):
-    """Pretražuje kontakte u bazi prema različitim kriterijima."""
+    """Search contacts by all criteria"""
     with sqlite3.connect("phonebook.db") as conn:
         c = conn.cursor()
         c.execute("SELECT DISTINCT Korisnici.* FROM Korisnici "
@@ -47,7 +47,7 @@ def get_phone(oib):
 
 
 def get_email(oib):
-    """dobavlja email iz baze"""
+    """mail from the baze"""
     with sqlite3.connect("phonebook.db") as conn:
         c = conn.cursor()
         c.execute("SELECT * FROM Mail WHERE korisnik_id=?", (oib,))
@@ -58,7 +58,7 @@ def get_email(oib):
 
 
 def add_korisnik(oib, name, surname):
-    """dodaje korisnika u bazu"""
+    """add user to the base"""
     with sqlite3.connect("phonebook.db") as conn:
         c = conn.cursor()
         query = c.execute("SELECT oib FROM Korisnici WHERE oib=?", (oib,)).fetchone()
@@ -72,26 +72,26 @@ def add_korisnik(oib, name, surname):
 
 
 def add_phone(oib, number):
-    """Dodaje broj u bazu ako nije prazan"""
+    """add number if not empty"""
     if number.strip():
         with sqlite3.connect("phonebook.db") as conn:
             c = conn.cursor()
-            # Provjera postoji li korisnik
+            # Check if user exists
             query = c.execute("SELECT oib FROM Korisnici WHERE oib=?", (oib,)).fetchone()
             if query is None:
                 messagebox.showinfo('info', 'Contact does not exist')
             else:
-                # Provjeri postojeće brojeve telefona za ovog korisnika
+                # Check existing phone numbers 
                 c.execute("SELECT broj FROM Telefon WHERE korisnik_id=?", (oib,))
                 existing_numbers = [row[0] for row in c.fetchall()]
                 if number not in existing_numbers:
                     c.execute("INSERT INTO Telefon (korisnik_id, broj) VALUES (?, ?)", (oib, number))
                     conn.commit()
-                # Ako broj već postoji, ne radimo ništa
+                # If number exists, do nothing
 
 
 def add_mail(oib, mail):
-    """dodaje mail u bazu ako nije prazan"""
+    """add mail if not empty"""
     # if mail.strip():
     with sqlite3.connect("phonebook.db") as conn:
         c = conn.cursor()
@@ -104,7 +104,7 @@ def add_mail(oib, mail):
 
 
 def delete_korisnik(oib):
-    """briše korisnika i sve podatke (oib, ime, prezime, broj, mail)"""
+    """delete user and all data"""
     with sqlite3.connect("phonebook.db") as conn:
         c = conn.cursor()
         c.execute("DELETE FROM Korisnici WHERE oib=?", (oib,))
@@ -114,7 +114,7 @@ def delete_korisnik(oib):
 
 
 def delete_phone_by_user(oib):
-    """briše broj telefona"""
+    """delete phone number"""
     with sqlite3.connect("phonebook.db") as conn:
         c = conn.cursor()
         c.execute("DELETE FROM Telefon WHERE korisnik_id=?", (oib,))
@@ -122,7 +122,7 @@ def delete_phone_by_user(oib):
 
 
 def delete_phone_from_listbox(phone):
-    """briše broj telefona koji je označen u listbox telefon"""
+    """delete phone number labeled in listbox"""
     with sqlite3.connect("phonebook.db") as conn:
         c = conn.cursor()
         c.execute("DELETE FROM Telefon WHERE broj=?", (phone,))
@@ -130,7 +130,7 @@ def delete_phone_from_listbox(phone):
 
 
 def delete_mail_from_listbox(email):
-    """briše broj telefona koji je označen u listbox telefon"""
+    """delete mail labeled in listbox"""
     with sqlite3.connect("phonebook.db") as conn:
         c = conn.cursor()
         c.execute("DELETE FROM Mail WHERE email=?", (email,))
@@ -138,7 +138,7 @@ def delete_mail_from_listbox(email):
 
 
 def delete_email(oib):
-    """briše email"""
+    """delete email"""
     with sqlite3.connect("phonebook.db") as conn:
         c = conn.cursor()
         c.execute("DELETE FROM Mail WHERE korisnik_id=?", (oib,))
@@ -146,7 +146,7 @@ def delete_email(oib):
 
 
 def edit_korisnik(oib, ime, prezime, broj, mail):
-    """uređuje korisnika i sve podatke (oib, ime, prezime, broj, mail)"""
+    """edit user and all data (oib, ime, prezime, broj, mail)"""
     with sqlite3.connect("phonebook.db") as conn:
         c = conn.cursor()
         c.execute("UPDATE Korisnici SET ime=?, prezime=? WHERE oib=?", (ime, prezime, oib))
@@ -177,9 +177,9 @@ def edit_phone_backend(oib, number, old_phone):
                 conn.commit()
                 return True
             else:
-                return False  # Korisnik s navedenim oib-om ne postoji
+                return False  # User with thid oib does not exist
     except sqlite3.Error as e:
-        print("Greška prilikom ažuriranja telefonskog broja:", str(e))
+        print("Error in updating phone number:", str(e))
         return False
 
 
